@@ -9,11 +9,11 @@ import os
 
 # Rules for prefixes:
 # 1. File names are obligated to start with a prefix if there is one.
-# 2. Prefixes can't contain any underscores ('_') or digits.
+# 2. Prefixes can't contain any whitespaces, underscores ('_') or digits.
 # 3. Prefixes are obligated to be terminated with an underscore
 
 def validate_prefix(prefix):
-    return ''.join((char for char in prefix if char not in '_0123456789'))  # Deleting unwanted characters
+    return ''.join((char for char in prefix if char not in ' _0123456789'))  # Deleting unwanted characters
 
 
 def find_end_of_prefix(file):
@@ -48,7 +48,8 @@ def main_file_name(directory, prefix=''):
 def renamer(prefix, base_dir):
     prefix = validate_prefix(prefix)
     for directory in os.listdir(base_dir):
-        new_dir_name = base_dir + '/' + prefix + '_' + directory
+        prefix_end = find_end_of_prefix(directory) + 1
+        new_dir_name = base_dir + '/' + prefix + '_' + directory[prefix_end:]
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
             for file in os.listdir(directory):
@@ -59,7 +60,9 @@ def renamer(prefix, base_dir):
                 # TODO: probably worth it to find a good way to get rid of this 'if' block
                 if file[prefix_end].isalpha():   # Adding a corresponding number to the files with solutions
                     tmp = ''
-                    for char in directory:
+                    for char in os.path.basename(directory):
+                        # TODO: introduce a flag to check if we have stumbled upon a number, and use it to stop the
+                        #  loop when we stumble upon an underscore
                         if char.isdigit():
                             tmp += char
                     if tmp != '':
@@ -86,7 +89,7 @@ def imp_adjustment(base_dir):
                         file_data = f.read()
 
                     pos_1 = file_data.find('from') + 5
-                    pos_2 = file_data.find('import') - 1
+                    pos_2 = file_data.find('import', pos_1) - 1
                     file_data = file_data[:pos_1] + main_file_name(directory) + file_data[pos_2:]
 
                     with open(directory + '/' + file, 'w') as f:
