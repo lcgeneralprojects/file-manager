@@ -2,7 +2,7 @@
 # TODO: implement GUI
 # TODO: make the empty-prefixed calls identity operations for those base directories
 # TODO: edit the test files to correctly refer to their main files
-# TODO: implement other file management features
+# TODO: implement other file management features, like automated file creation
 
 import os
 
@@ -13,15 +13,7 @@ import os
 # 3. Prefixes are obligated to be terminated with an underscore
 
 def validate_prefix(prefix):
-    return ''.join((char for char in prefix if char not in '_0123456789'))
-
-
-def main_file_name(directory, prefix=None):
-    res = os.path.basename(directory)
-    for i in reversed(range(len(res))):
-        if res[i] == '_':
-            res = res[:i+1] + prefix + 'f_' + res[i+1:]
-    return res
+    return ''.join((char for char in prefix if char not in '_0123456789'))  # Deleting unwanted characters
 
 
 def find_end_of_prefix(file):
@@ -37,10 +29,20 @@ def find_end_of_exercise_number(file):
     prefix_end = find_end_of_prefix(file) + 1
     for i in range(prefix_end, len(file)):
         if file[i].isalpha():
-            return prefix_end
+            return prefix_end   # No exercise number found
         elif file[i] == '_':
             return i
-    return prefix_end
+    return prefix_end           # No exercise number found
+
+
+def main_file_name(directory, prefix=''):
+    res = os.path.basename(directory)
+    pos = find_end_of_prefix(res) + 1
+    res = res[:pos] + 'f_' + res[pos:]
+    # for i in reversed(range(len(res))):
+    #     if res[i] == '_':
+    #         res = res[:i+1] + prefix + 'f_' + res[i+1:]
+    return res
 
 
 def renamer(prefix, base_dir):
@@ -52,9 +54,8 @@ def renamer(prefix, base_dir):
             for file in os.listdir(directory):
                 # TODO: find current prefix end and edit that
                 prefix_end = find_end_of_prefix(file) + 1
-                if prefix != '':
-                    new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
-                    os.rename(directory + '/' + file, new_file_name)   # Adding a prefix
+                new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
+                os.rename(directory + '/' + file, new_file_name)   # Adding a prefix
                 # TODO: probably worth it to find a good way to get rid of this 'if' block
                 if file[prefix_end].isalpha():   # Adding a corresponding number to the files with solutions
                     tmp = ''
@@ -69,11 +70,14 @@ def renamer(prefix, base_dir):
 
             os.rename(directory, new_dir_name)
 
+
 # TODO: unify this with the renamer function
 def imp_adjustment(base_dir):
     for directory in os.listdir(base_dir):
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
+            if 'common' in directory:
+                continue
             for file in os.listdir(directory):
                 # A check that makes sure that we are dealing with a test file
                 if 'test' in file:
@@ -87,12 +91,19 @@ def imp_adjustment(base_dir):
 
                     with open(directory + '/' + file, 'w') as f:
                         f.write(file_data)
+
                 else:
-                    for i in reversed(range(len(file))):
-                        if file[i] == '_':
-                            new_name = file[:i + 1] + 'f_' + file[i + 1:]
-                            os.rename(directory + '/' + file, directory + '/' + new_name)
-                            break
+                    end_of_exercise_number = find_end_of_exercise_number(file)
+                    # In case that we have already marked the file as a file with 'f_', we don't do that again
+                    if file[end_of_exercise_number:end_of_exercise_number+2] != 'f_':
+                        new_name = file[:end_of_exercise_number] + 'f_' + file[end_of_exercise_number:]
+                        os.rename(directory + '/' + file, directory + '/' + new_name)
+                # else:
+                #     for i in reversed(range(len(file))):
+                #         if file[i] == '_':
+                #             new_name = file[:i + 1] + 'f_' + file[i + 1:]
+                #             os.rename(directory + '/' + file, directory + '/' + new_name)
+                #             break
 
 
 if __name__ == '__main__':
