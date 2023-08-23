@@ -19,20 +19,20 @@ def validate_prefix(prefix):
 def find_end_of_prefix(file):
     for i in range(len(file)):
         if file[i].isdigit():
-            return -1           # No prefix found
+            return -1  # No prefix found
         elif file[i] == '_':
             return i
-    return -1                   # No prefix found
+    return -1  # No prefix found
 
 
 def find_end_of_exercise_number(file):
     prefix_end = find_end_of_prefix(file) + 1
     for i in range(prefix_end, len(file)):
         if file[i].isalpha():
-            return prefix_end   # No exercise number found
+            return prefix_end  # No exercise number found
         elif file[i] == '_':
             return i
-    return prefix_end           # No exercise number found
+    return prefix_end  # No exercise number found
 
 
 def main_file_name(directory, prefix=''):
@@ -53,12 +53,11 @@ def renamer(prefix, base_dir):
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
             for file in os.listdir(directory):
-                # TODO: find current prefix end and edit that
                 prefix_end = find_end_of_prefix(file) + 1
                 new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
-                os.rename(directory + '/' + file, new_file_name)   # Adding a prefix
+                os.rename(directory + '/' + file, new_file_name)  # Adding a prefix
                 # TODO: probably worth it to find a good way to get rid of this 'if' block
-                if file[prefix_end].isalpha():   # Adding a corresponding number to the files with solutions
+                if file[prefix_end].isalpha():  # Adding a corresponding number to the files with solutions
                     tmp = ''
                     for char in os.path.basename(directory):
                         # TODO: introduce a flag to check if we have stumbled upon a number, and use it to stop the
@@ -67,8 +66,9 @@ def renamer(prefix, base_dir):
                             tmp += char
                     if tmp != '':
                         tmp += '_'
-                    new_name = file[:prefix_end] + tmp + file[prefix_end:]      # The 'cutting' point should not be at index 3, but after
-                                                                                # the prefix
+                    new_name = file[:prefix_end] + tmp + file[
+                                                         prefix_end:]  # The 'cutting' point should not be at index 3, but after
+                    # the prefix
                     os.rename(directory + '/' + file, directory + '/' + new_name)
 
             os.rename(directory, new_dir_name)
@@ -98,7 +98,7 @@ def imp_adjustment(base_dir):
                 else:
                     end_of_exercise_number = find_end_of_exercise_number(file)
                     # In case that we have already marked the file as a file with 'f_', we don't do that again
-                    if file[end_of_exercise_number:end_of_exercise_number+2] != 'f_':
+                    if file[end_of_exercise_number:end_of_exercise_number + 2] != 'f_':
                         new_name = file[:end_of_exercise_number] + 'f_' + file[end_of_exercise_number:]
                         os.rename(directory + '/' + file, directory + '/' + new_name)
                 # else:
@@ -107,6 +107,35 @@ def imp_adjustment(base_dir):
                 #             new_name = file[:i + 1] + 'f_' + file[i + 1:]
                 #             os.rename(directory + '/' + file, directory + '/' + new_name)
                 #             break
+
+
+# The function for transforming names of problems into appropriate file names
+# TODO: currently, only supports Leetcode. Need to make it more general.
+def get_file_name(problem_name):
+    trans_dict = str.maketrans(' ', '_', '.')
+    res = problem_name.translate(trans_dict).lower()
+    res = res[:res.find('_') + 1] + 'f_' + res[res.find('_') + 1:]
+    return res
+
+
+# TODO: implement automated file creation
+def file_creation(base_dir, prefix, problem_name):
+    prefix = validate_prefix(prefix)
+
+    main_file_name = prefix + get_file_name(problem_name)
+    directory_name = os.path.join(base_dir, main_file_name.replace('f_', ''))
+    test_file_name = main_file_name[:find_end_of_exercise_number()] + '_test.py'
+
+    if os.path.isdir(directory_name):
+        os.mkdir(base_dir + '/' + directory_name)
+
+    with open(directory_name + '/' + main_file_name + '.py', 'x') as f:
+        pass
+
+    with open(directory_name + '/' + test_file_name + '.py', 'w') as new_test_file,\
+            open(base_dir + f'/{prefix}_common/{prefix}_test_template.py') as template:
+        for line in template:
+            new_test_file.write(line)
 
 
 if __name__ == '__main__':
