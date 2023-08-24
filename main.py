@@ -45,7 +45,7 @@ def main_file_name(directory, prefix=''):
     return res
 
 
-def renamer(prefix, base_dir):
+def renamer(base_dir, prefix):
     prefix = validate_prefix(prefix)
     for directory in os.listdir(base_dir):
         prefix_end = find_end_of_prefix(directory) + 1
@@ -122,29 +122,42 @@ def get_file_name(problem_name):
 def file_creation(base_dir, prefix, problem_name):
     prefix = validate_prefix(prefix)
 
-    main_file_name = prefix + get_file_name(problem_name)
+    main_file_name = prefix + '_' + get_file_name(problem_name)
     directory_name = os.path.join(base_dir, main_file_name.replace('f_', ''))
-    test_file_name = main_file_name[:find_end_of_exercise_number()] + '_test.py'
+    test_file_name = main_file_name[:find_end_of_exercise_number(main_file_name)] + '_test.py'
 
-    if os.path.isdir(directory_name):
-        os.mkdir(base_dir + '/' + directory_name)
-
-    with open(directory_name + '/' + main_file_name + '.py', 'x') as f:
+    if not os.path.isdir(directory_name):
+        os.mkdir(directory_name)
+    try:
+        with open(directory_name + '/' + main_file_name + '.py', 'x') as f:
+            pass
+    except FileExistsError:
         pass
 
-    with open(directory_name + '/' + test_file_name + '.py', 'w') as new_test_file,\
-            open(base_dir + f'/{prefix}_common/{prefix}_test_template.py') as template:
-        for line in template:
-            new_test_file.write(line)
+    with open(directory_name + '/' + test_file_name + '.py', 'w') as new_test_file:
+        try:
+            with open(base_dir + f'/{prefix}_common/{prefix}_test_template.py', 'r') as template:
+                for line in template:
+                    new_test_file.write(line)
+        except FileNotFoundError:
+            pass
 
 
 if __name__ == '__main__':
+    # TODO: consider generalising the handling of the method prompt using the function dictionary
+    # function_dict = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
+
     while True:
         method = input("Method: ")
         if method == 'renamer':
-            prefix = input("Prefix: ")
             base_dir = input("Base directory: ")
-            renamer(prefix, base_dir)
+            prefix = input("Prefix: ")
+            renamer(base_dir, prefix)
         elif method == 'import_adjustment':
             base_dir = input("Base directory: ")
             imp_adjustment(base_dir)
+        elif method == 'file_creation':
+            base_dir = input("Base directory: ")
+            prefix = input("Prefix: ")
+            problem_name = input("Problem name: ")
+            file_creation(base_dir, prefix, problem_name)
