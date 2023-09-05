@@ -1,6 +1,9 @@
 # file-renamer project-specific
 testing_grounds/
 
+# configuration files
+settings/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
