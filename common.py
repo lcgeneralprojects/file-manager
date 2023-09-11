@@ -5,15 +5,25 @@
 # TODO: implement other file management features, like automated file creation
 
 import os
-
+from exceptions import EmptyArgsException
 
 # Rules for prefixes:
 # 1. File names are obligated to start with a prefix if there is one.
 # 2. Prefixes can't contain any whitespaces, underscores ('_') or digits.
 # 3. Prefixes are obligated to be terminated with an underscore
 
+
 def validate_prefix(prefix):
     return ''.join((char for char in prefix if char not in ' _0123456789'))  # Deleting unwanted characters
+
+
+def validate_args(**args):
+    empty_args = []
+    for key, value in args.items():
+        if value == '' or value is None:
+            empty_args.append(key)
+    if empty_args:
+        raise EmptyArgsException(empty_args)
 
 
 def find_end_of_prefix(file):
@@ -45,7 +55,7 @@ def main_file_name(directory, prefix=''):
     return res
 
 
-def renamer(base_dir, prefix):
+def renamer(base_dir, prefix, problem_name=None):
     prefix = validate_prefix(prefix)
     for directory in os.listdir(base_dir):
         prefix_end = find_end_of_prefix(directory) + 1
@@ -75,7 +85,7 @@ def renamer(base_dir, prefix):
 
 
 # TODO: unify this with the renamer function
-def imp_adjustment(base_dir):
+def imp_adjustment(base_dir, prefix=None, problem_name=None):
     for directory in os.listdir(base_dir):
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
@@ -118,8 +128,13 @@ def get_file_name(problem_name):
     return res
 
 
-# TODO: implement automated file creation
+# TODO: check for errors using a decorator?
 def file_creation(base_dir, prefix, problem_name):
+    try:
+        validate_args(base_dir=base_dir, prefix=prefix, problem_name=problem_name)
+    except EmptyArgsException:
+        return
+
     prefix = validate_prefix(prefix)
 
     main_file_name = prefix + '_' + get_file_name(problem_name)
@@ -143,8 +158,12 @@ def file_creation(base_dir, prefix, problem_name):
         except FileNotFoundError:
             pass
 
+
+methods_dict = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
+
+
 def general_function_handler(method, base_dir, prefix, problem_name):
-    pass
+    methods_dict[method](base_dir, prefix, problem_name)
 
 
 if __name__ == '__main__':
