@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import filedialog
 from common import general_function_handler
+from PIL import Image
 
 
 # Master section
@@ -63,6 +64,7 @@ def set_base_dir():
     base_dir_entry.insert(0, filedialog.askdirectory())
     return
 
+original_image = Image.open(r'assets\folder_icon.png')
 directory_icon = tk.PhotoImage(file=r'assets\folder_icon.png')
 directory_button = tk.Button(base_dir_frame, image=directory_icon, command=lambda: set_base_dir())
 directory_button.grid(row=0, column=2)
