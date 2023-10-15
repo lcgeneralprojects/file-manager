@@ -1,8 +1,5 @@
 # This is a project for an automated file renamer
-# TODO: implement GUI
 # TODO: make the empty-prefixed calls identity operations for those base directories
-# TODO: edit the test files to correctly refer to their main files
-# TODO: implement other file management features, like automated file creation
 
 import os
 # from exceptions import EmptyArgsException
