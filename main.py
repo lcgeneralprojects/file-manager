@@ -84,7 +84,8 @@ def save_preset():
         param_dict[key] = entry_object.get()
     if not os.path.isdir('./preset'):
         os.makedirs('./preset')
-    with open(param_dict['Preset name']) as file:
+    # TODO: consider the case where the name is empty
+    with open(param_dict['Preset name'], 'w') as file:
         for key, value in param_dict.items():
             if not key == 'Preset name':
                 file.write(key + ': ' + value + '\n')

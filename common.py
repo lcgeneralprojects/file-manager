@@ -33,7 +33,7 @@ def find_end_of_prefix(file):
     return -1  # No prefix found
 
 
-def find_end_of_exercise_number(file):
+def find_end_of_exercise_number_from_file(file):
     prefix_end = find_end_of_prefix(file) + 1
     for i in range(prefix_end, len(file)):
         if file[i].isalpha():
@@ -41,6 +41,11 @@ def find_end_of_exercise_number(file):
         elif file[i] == '_':
             return i
     return prefix_end  # No exercise number found
+
+
+def find_end_of_exercise_number_from_directory(directory):
+    return os.path.basename(directory).split('_')[1]
+
 
 
 def main_file_name(directory, prefix=''):
@@ -60,24 +65,52 @@ def renamer(base_dir, prefix, problem_name=None):
         new_dir_name = base_dir + '/' + prefix + '_' + directory[prefix_end:]
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
-            for file in os.listdir(directory):
-                prefix_end = find_end_of_prefix(file) + 1
-                new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
-                os.rename(directory + '/' + file, new_file_name)  # Adding a prefix
-                # TODO: probably worth it to find a good way to get rid of this 'if' block
-                if file[prefix_end].isalpha():  # Adding a corresponding number to the files with solutions
-                    tmp = ''
-                    for char in os.path.basename(directory):
-                        # TODO: introduce a flag to check if we have stumbled upon a number, and use it to stop the
-                        #  loop when we stumble upon an underscore
-                        if char.isdigit():
-                            tmp += char
-                    if tmp != '':
-                        tmp += '_'
-                    new_name = file[:prefix_end] + tmp + file[
-                                                         prefix_end:]  # The 'cutting' point should not be at index 3, but after
-                    # the prefix
-                    os.rename(directory + '/' + file, directory + '/' + new_name)
+            if 'common' not in os.path.basename(directory):
+                for file in os.listdir(directory):
+                    prefix_end = find_end_of_prefix(file) + 1
+                    new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
+                    os.rename(directory + '/' + file, new_file_name)  # Adding a prefix
+                    # TODO: probably worth it to find a good way to get rid of this 'if' block
+                    # Checking for if the character at the prefix_end is a letter prevents us from adding a
+                    # problem number for no good reason
+                    if file[prefix_end].isalpha():  # Adding a corresponding number to the files with solutions
+                        # tmp = ''
+                        # for char in os.path.basename(directory):
+                        #     # TODO: introduce a flag to check if we have stumbled upon a number, and use it to stop the
+                        #     #  loop when we stumble upon an underscore
+                        #     if char.isdigit():
+                        #         tmp += char
+                        # if tmp != '':
+                        #     tmp += '_'
+                        problem_number = find_end_of_exercise_number_from_directory(directory)
+
+                        # new_name = file[:prefix_end] + problem_number + file[
+                        #                                                 prefix_end:]    # The 'cutting' point should not be at index 3, but after
+                        #                                                                 # the prefix
+
+                        if 'test' in os.path.basename(file):
+                            file_data = ''
+                            with open(directory + '/' + file, 'r') as f:
+                                file_data = f.read()
+
+                            pos_1 = file_data.find('from') + 5
+                            pos_2 = file_data.find('import', pos_1) - 1
+                            file_data = file_data[:pos_1] + main_file_name(directory) + file_data[pos_2:]
+
+                            with open(directory + '/' + file, 'w') as f:
+                                f.write(file_data)
+
+                            new_name = file[:prefix_end] + problem_number + file[
+                                                                            prefix_end:]    # The 'cutting' point should not be at index 3, but after
+                                                                                            # the prefix
+                        else:
+                            new_name = file[:prefix_end] + problem_number + 'f_' + file[
+                                                                                   prefix_end:]     # The 'cutting' point should not be at index 3, but after
+                                                                                                    # the prefix
+                        os.rename(directory + '/' + file, directory + '/' + new_name)
+
+
+
 
             os.rename(directory, new_dir_name)
 
@@ -87,7 +120,7 @@ def imp_adjustment(base_dir, prefix=None, problem_name=None):
     for directory in os.listdir(base_dir):
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
-            if 'common' in directory:
+            if 'common' in os.path.basename(directory):
                 continue
             for file in os.listdir(directory):
                 # A check that makes sure that we are dealing with a test file
@@ -104,7 +137,7 @@ def imp_adjustment(base_dir, prefix=None, problem_name=None):
                         f.write(file_data)
 
                 else:
-                    end_of_exercise_number = find_end_of_exercise_number(file)
+                    end_of_exercise_number = find_end_of_exercise_number_from_file(file)
                     # In case that we have already marked the file as a file with 'f_', we don't do that again
                     if file[end_of_exercise_number:end_of_exercise_number + 2] != 'f_':
                         new_name = file[:end_of_exercise_number] + 'f_' + file[end_of_exercise_number:]
@@ -137,7 +170,7 @@ def file_creation(base_dir, prefix, problem_name):
 
     main_file_name = prefix + '_' + get_file_name(problem_name)
     directory_name = os.path.join(base_dir, main_file_name.replace('f_', ''))
-    test_file_name = main_file_name[:find_end_of_exercise_number(main_file_name)] + '_test'
+    test_file_name = main_file_name[:find_end_of_exercise_number_from_file(main_file_name)] + '_test'
 
     if not os.path.isdir(directory_name):
         os.mkdir(directory_name)
