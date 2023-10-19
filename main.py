@@ -25,6 +25,7 @@ label_and_entry_frame.pack(padx=50, pady=10, fill='x')
 for c in range(4): label_and_entry_frame.columnconfigure(index=c, weight=1)
 for r in range(6): label_and_entry_frame.rowconfigure(index=r, weight=1)
 label_and_entry_frame.columnconfigure(index=1, weight=2)
+label_and_entry_frame.rowconfigure(index=4, minsize=16)
 # # Preset frame
 # preset_frame = tk.Frame(main_body_frame)
 # preset_frame.grid(row=1, column=0, sticky='nsew')
@@ -85,7 +86,7 @@ def save_preset():
     if not os.path.isdir('./preset'):
         os.makedirs('./preset')
     # TODO: consider the case where the name is empty
-    with open(param_dict['Preset name'], 'w') as file:
+    with open('./preset/' + param_dict['preset name'] + '.txt', 'w') as file:
         for key, value in param_dict.items():
             if not key == 'Preset name':
                 file.write(key + ': ' + value + '\n')
@@ -100,7 +101,7 @@ def choose_preset():
     for key in ENTRY_OBJECT_DICT.keys():
         param_dict[key] = None
     with open(filename, 'r') as file:
-        param_dict['Preset name'] = os.path.basename(file.name)
+        param_dict['preset name'] = os.path.basename(file.name)
         for line in file:
             if line.strip() == '':
                 continue

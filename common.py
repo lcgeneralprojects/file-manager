@@ -47,7 +47,6 @@ def find_end_of_exercise_number_from_directory(directory):
     return os.path.basename(directory).split('_')[1]
 
 
-
 def main_file_name(directory, prefix=''):
     res = os.path.basename(directory)
     pos = find_end_of_prefix(res) + 1
@@ -66,6 +65,7 @@ def renamer(base_dir, prefix, problem_name=None):
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
             if 'common' not in os.path.basename(directory):
+                # TODO: consider a more elegant solution using the split() method
                 for file in os.listdir(directory):
                     prefix_end = find_end_of_prefix(file) + 1
                     new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
@@ -190,11 +190,11 @@ def file_creation(base_dir, prefix, problem_name):
             pass
 
 
-methods_dict = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
+METHODS_DICT = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
 
 
 def general_function_handler(method, base_dir, prefix, problem_name):
-    methods_dict[method](base_dir, prefix, problem_name)
+    METHODS_DICT[method](base_dir, prefix, problem_name)
 
 
 if __name__ == '__main__':
