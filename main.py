@@ -88,7 +88,7 @@ def save_preset():
     # TODO: consider the case where the name is empty
     with open('./preset/' + param_dict['preset name'] + '.txt', 'w') as file:
         for key, value in param_dict.items():
-            if not key == 'Preset name':
+            if not key == 'preset name':
                 file.write(key + ': ' + value + '\n')
 
 save_preset_button = tk.Button(label_and_entry_frame, text='save preset', command=save_preset)
@@ -106,7 +106,7 @@ def choose_preset():
             if line.strip() == '':
                 continue
             key, value = line.split(': ', 1)
-            param_dict[key] = value
+            param_dict[key] = value.replace('\n', '')
     for key, value in param_dict.items():
         if value is not None:
             ENTRY_OBJECT_DICT[key].delete(0, tk.END)
