@@ -1,5 +1,9 @@
-# file-renamer project-specific
+# file-manager project-specific
 testing_grounds/
+preset/
+
+# configuration files
+settings/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
