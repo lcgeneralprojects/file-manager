@@ -1,5 +1,6 @@
 # This is a project for an automated file renamer
 # TODO: make the empty-prefixed calls identity operations for those base directories
+# TODO: make choice of extension available
 
 import os
 # from exceptions import EmptyArgsException

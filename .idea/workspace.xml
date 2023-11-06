@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="17c6ea6e-1f6f-42a9-8bf3-f5907e70296b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common.py" beforeDir="false" afterPath="$PROJECT_DIR$/common.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -84,7 +85,7 @@
         <watch expression="'./preset' + param_dict['Preset name'] + '.txt'" language="Python" />
         <watch expression="param_dict['Preset name']" language="Python" />
       </configuration>
-      <inline-watch fileUrl="file://$PROJECT_DIR$/main.py" line="84">
+      <inline-watch fileUrl="file://$PROJECT_DIR$/main.py" line="103">
         <watch expression="entry_object.get()" />
       </inline-watch>
     </watches-manager>
