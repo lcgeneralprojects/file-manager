@@ -126,9 +126,6 @@ def renamer(**kwargs):   # base_dir, prefix
                                                                                                     # the prefix
                         os.rename(directory + '/' + file, directory + '/' + new_name)
 
-
-
-
             os.rename(directory, new_dir_name)
 
 

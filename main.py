@@ -88,7 +88,7 @@ directory_button.grid(row=1, column=2, sticky='W')
 
 
 def paste_problem_name():
-    problem_name = pyperclip.paste().strip(' \n')
+    problem_name = pyperclip.paste().strip(' \n\r')
     problem_name_entry.delete(0, tk.END)
     problem_name_entry.insert(0, problem_name)
 
