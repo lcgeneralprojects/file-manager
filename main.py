@@ -31,7 +31,7 @@ bottom_frame = tk.Frame(root)
 bottom_frame.pack(side='bottom', fill='x')
 
 # Label section
-action_label = tk.Label(label_and_entry_frame, text='Method: ')
+action_label = tk.Label(label_and_entry_frame, text='Action: ')
 action_label.grid(row=0, column=0, sticky='E')
 base_dir_label = tk.Label(label_and_entry_frame, text='Base directory: ')
 base_dir_label.grid(row=1, column=0, sticky='E')
@@ -45,11 +45,10 @@ preset_name_label = tk.Label(label_and_entry_frame, text='Preset name: ')
 preset_name_label.grid(row=6, column=0, sticky='E')
 
 # Entry section
-# TODO: make method_entry a drop-down menu
 OPTION_LIST = list(common.ACTIONS_DICT.keys())
 action_text_var = tk.StringVar(label_and_entry_frame)
 # TODO: implement auto-completion
-action_combobox = ttk.Combobox(label_and_entry_frame, values=OPTION_LIST)
+action_combobox = ttk.Combobox(label_and_entry_frame, textvariable=action_text_var, values=OPTION_LIST)
 action_combobox.grid(row=0, column=1, sticky='EW')
 # method_dropbox = tk.OptionMenu(label_and_entry_frame, action_text_var, *OPTION_LIST)    # Including this in the 'entry' section, at least for now
 # method_dropbox.grid(row=0, column=1, sticky='EW')
@@ -132,12 +131,16 @@ def choose_preset():
         for line in file:
             if line.strip() == '':
                 continue
+            # TODO: use ternary operator for when there are fewer than 2 elements in line.split(': ')
             key, value = line.split(': ', 1)
             param_dict[key] = value.replace('\n', '')
     for key, value in param_dict.items():
         if value is not None:
-            ENTRY_OBJECT_DICT[key].delete(0, tk.END)
-            ENTRY_OBJECT_DICT[key].insert(0, value)
+            if isinstance(ENTRY_OBJECT_DICT[key], tk.StringVar):
+                ENTRY_OBJECT_DICT[key].set(value)
+            else:
+                ENTRY_OBJECT_DICT[key].delete(0, tk.END)
+                ENTRY_OBJECT_DICT[key].insert(0, value)
 
 choose_preset_button = tk.Button(label_and_entry_frame, text='choose preset', command=choose_preset)
 choose_preset_button.grid(row=6, column=3, sticky='EW')
