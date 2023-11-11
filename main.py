@@ -3,13 +3,15 @@ import tkinter as tk
 from tkinter import filedialog
 from common import general_function_handler
 from PIL import Image, ImageTk
+import pyperclip
 
 
 # Master section
 root = tk.Tk()
 root.title('File Manager')
-root.minsize(400, 250)
+root.minsize(600, 250)
 
+# TODO: Introduce a label to indicate whether the chosen 'method' finished successfully or not
 # TODO: consider organising things into classes
 
 # Frame section
@@ -21,11 +23,11 @@ root.minsize(400, 250)
 # Label-and-entry frame
 label_and_entry_frame = tk.Frame(root, relief='raised', borderwidth=5)  # TODO: remove relief and borderwidth after done testing
 # label_and_entry_frame.grid(row=0, column=0, sticky='nsew')
-label_and_entry_frame.pack(padx=50, pady=10, fill='x')
+label_and_entry_frame.pack(padx=20, pady=10, fill='x')
 for c in range(4): label_and_entry_frame.columnconfigure(index=c, weight=1)
-for r in range(6): label_and_entry_frame.rowconfigure(index=r, weight=1)
-label_and_entry_frame.columnconfigure(index=1, weight=2)
-label_and_entry_frame.rowconfigure(index=4, minsize=16)
+for r in range(7): label_and_entry_frame.rowconfigure(index=r, weight=1)
+label_and_entry_frame.columnconfigure(index=1, weight=2, minsize=200)
+label_and_entry_frame.rowconfigure(index=5, minsize=16)
 # # Preset frame
 # preset_frame = tk.Frame(main_body_frame)
 # preset_frame.grid(row=1, column=0, sticky='nsew')
@@ -43,8 +45,10 @@ prefix_label = tk.Label(label_and_entry_frame, text='Prefix: ')
 prefix_label.grid(row=2, column=0, sticky='E')
 problem_name_label = tk.Label(label_and_entry_frame, text='Problem name: ')
 problem_name_label.grid(row=3, column=0, sticky='E')
+extension_label = tk.Label(label_and_entry_frame, text='Extension: ')
+extension_label.grid(row=4, column=0, sticky='E')
 preset_name_label = tk.Label(label_and_entry_frame, text='Preset name: ')
-preset_name_label.grid(row=5, column=0, sticky='E')
+preset_name_label.grid(row=6, column=0, sticky='E')
 
 # Entry section
 # TODO: make method_entry a drop-down menu
@@ -56,20 +60,24 @@ prefix_entry = tk.Entry(label_and_entry_frame)
 prefix_entry.grid(row=2, column=1, sticky='EW')
 problem_name_entry = tk.Entry(label_and_entry_frame)
 problem_name_entry.grid(row=3, column=1, sticky='EW')
+extension_entry = tk.Entry(label_and_entry_frame)
+extension_entry.grid(row=4, column=1, sticky='EW')
 preset_name_entry = tk.Entry(label_and_entry_frame)
-preset_name_entry.grid(row=5, column=1, sticky='EW')
+preset_name_entry.grid(row=6, column=1, sticky='EW')
 
 ENTRY_OBJECT_DICT = {'method': method_entry, 'base dir': base_dir_entry, 'prefix': prefix_entry,
-                     'problem name': problem_name_entry, 'preset name': preset_name_entry}
+                     'problem name': problem_name_entry,'extension': extension_entry, 'preset name': preset_name_entry}
 
 # Button section
 ok_button = tk.Button(bottom_frame, text='Ok',
-                      command=lambda: general_function_handler(method_entry.get(), base_dir_entry.get(),
-                                                               prefix_entry.get(), problem_name_entry.get()))
+                      command=lambda: general_function_handler(method=method_entry.get(), base_dir=base_dir_entry.get(),
+                                                               prefix=prefix_entry.get(), problem_name=problem_name_entry.get(),
+                                                               extension=extension_entry.get()))
 ok_button.pack()
 
 def set_base_dir():
     base_dir_entry.delete(0, tk.END)
+    # TODO: might be preferable to first ask for directory and save the result in a variable, then delete-insert
     base_dir_entry.insert(0, filedialog.askdirectory())
     return
 
@@ -77,6 +85,22 @@ original_image = Image.open(r'assets\folder_icon.png')
 directory_icon = ImageTk.PhotoImage(original_image.resize((16, 16)))
 directory_button = tk.Button(label_and_entry_frame, image=directory_icon, command=lambda: set_base_dir())
 directory_button.grid(row=1, column=2, sticky='W')
+
+
+def paste_problem_name():
+    problem_name = pyperclip.paste().strip(' \n\r')
+    problem_name_entry.delete(0, tk.END)
+    problem_name_entry.insert(0, problem_name)
+
+paste_problem_name_button = tk.Button(label_and_entry_frame, text='paste name', command=paste_problem_name)
+paste_problem_name_button.grid(row=3, column=2, sticky='EW')
+
+
+def clear_problem_name():
+    problem_name_entry.delete(0, tk.END)
+
+clear_problem_name_button = tk.Button(label_and_entry_frame, text='clear name', command=clear_problem_name)
+clear_problem_name_button.grid(row=3, column=3, sticky='EW')
 
 
 def save_preset():
@@ -92,9 +116,10 @@ def save_preset():
                 file.write(key + ': ' + value + '\n')
 
 save_preset_button = tk.Button(label_and_entry_frame, text='save preset', command=save_preset)
-save_preset_button.grid(row=5, column=2, sticky='W')
+save_preset_button.grid(row=6, column=2, sticky='EW')
 
-
+# TODO: handle the FileNotFoundError when the directory request gets cancelled more gracefully
+# TODO: add default preset directory
 def choose_preset():
     filename = filedialog.askopenfilename()
     param_dict = {}
@@ -113,7 +138,7 @@ def choose_preset():
             ENTRY_OBJECT_DICT[key].insert(0, value)
 
 choose_preset_button = tk.Button(label_and_entry_frame, text='choose preset', command=choose_preset)
-choose_preset_button.grid(row=5, column=3, sticky='W')
+choose_preset_button.grid(row=6, column=3, sticky='EW')
 
 
 if __name__ == '__main__':
