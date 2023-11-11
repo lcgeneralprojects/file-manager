@@ -82,7 +82,7 @@ def renamer(**kwargs):   # base_dir, prefix
         directory = base_dir + '/' + directory
         if os.path.isdir(directory):
             if 'common' not in os.path.basename(directory):
-                # TODO: consider a more elegant solution using the split() method
+                # TODO: consider a more elegant solution using the split() action
                 for file in os.listdir(directory):
                     prefix_end = find_end_of_prefix(file) + 1
                     new_file_name = directory + '/' + prefix + '_' + file[prefix_end:]
@@ -208,17 +208,17 @@ def file_creation(**kwargs):        # base_dir, prefix, problem_name
             pass
 
 
-METHODS_DICT = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
+ACTIONS_DICT = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
 
 
-def general_function_handler(**kwargs): # method, base_dir, prefix, problem_name
-    method = kwargs['method']
-    del kwargs['method']
-    METHODS_DICT[method](**kwargs)
+def general_function_handler(**kwargs): # action, base_dir, prefix, problem_name
+    action = kwargs['action']
+    del kwargs['action']
+    ACTIONS_DICT[action](**kwargs)
 
 
 if __name__ == '__main__':
-    # TODO: consider generalising the handling of the method prompt using the function dictionary
+    # TODO: consider generalising the handling of the action prompt using the function dictionary
     # function_dict = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
 
     # TODO: consider allowing users to save some parameters during execution
