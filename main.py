@@ -19,7 +19,7 @@ root.minsize(600, 250)
 # Frame section
 # TODO: make the font size bigger, and make the sizes of other elements depend on the font size
 # Label-and-entry frame
-label_and_entry_frame = tk.Frame(root, relief='raised', borderwidth=5)  # TODO: remove relief and borderwidth after done testing
+label_and_entry_frame = tk.Frame(root, relief='raised', borderwidth=5)  # TODO: consider removing relief
 # label_and_entry_frame.grid(row=0, column=0, sticky='nsew')
 label_and_entry_frame.pack(padx=20, pady=10, fill='x')
 for c in range(4): label_and_entry_frame.columnconfigure(index=c, weight=1)

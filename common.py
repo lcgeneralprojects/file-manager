@@ -1,6 +1,5 @@
 # This is a project for an automated file renamer
 # TODO: make the empty-prefixed calls identity operations for those base directories
-# TODO: make choice of extension available
 # TODO: consider file name + extension limitations
 
 import os
@@ -166,7 +165,6 @@ def imp_adjustment(**kwargs):   # base_dir
 
 
 # The function for transforming names of problems into appropriate file names
-# TODO: currently, only supports Leetcode. Need to make it more general.
 def get_file_name(problem_name):    # problem_name
     trans_dict = str.maketrans(' ', '_', '.')
     res = problem_name.translate(trans_dict).lower()
@@ -175,7 +173,6 @@ def get_file_name(problem_name):    # problem_name
 
 
 # TODO: check for errors using a decorator?
-# TODO: allow for configurable file extensions
 def file_creation(**kwargs):        # base_dir, prefix, problem_name
     base_dir, prefix, problem_name, extension = kwargs['base_dir'], kwargs['prefix'], kwargs['problem_name'], kwargs['extension']
     try:
@@ -218,21 +215,18 @@ def general_function_handler(**kwargs): # action, base_dir, prefix, problem_name
 
 
 if __name__ == '__main__':
-    # TODO: consider generalising the handling of the action prompt using the function dictionary
-    # function_dict = {'renamer': renamer, 'import_adjustment': imp_adjustment, 'file_creation': file_creation}
-
     # TODO: consider allowing users to save some parameters during execution
     while True:
 
-        method = str(input("Method: "))
-        if method == 'renamer':
+        action = str(input("Method: "))
+        if action == 'renamer':
             base_dir = str(input("Base directory: "))
             prefix = str(input("Prefix: "))
             renamer(base_dir=base_dir, prefix=prefix)
-        elif method == 'import_adjustment':
+        elif action == 'import_adjustment':
             base_dir = str(input("Base directory: "))
             imp_adjustment(base_dir=base_dir)
-        elif method == 'file_creation':
+        elif action == 'file_creation':
             base_dir = str(input("Base directory: "))
             prefix = str(input("Prefix: "))
             problem_name = str(input("Problem name: "))
